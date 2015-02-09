@@ -15,11 +15,11 @@ function wml_actions.harvest_tree(cfg)
 			wml_actions.redraw {}
 
 			for i, side in ipairs(sides) do
-				local current_wood = wesnoth.get_variable(string.format("side_stats[%s].material", side.side)) or 0
-				local current_bonus = wesnoth.get_variable(string.format("side_bonuses[%s].tree", side.side)) or 0
+				local current_wood = wesnoth.get_variable(string.format("side_stats[%i].material", side.side)) or 0
+				local current_bonus = wesnoth.get_variable(string.format("side_bonuses[%i].tree", side.side)) or 0
 				local gain = amount + current_bonus
-				wesnoth.set_variable(string.format("side_stats[%s].material", side.side), (current_wood+gain))
-				wesnoth.float_label(x, y, string.format("<span foreground='#BCB088'>+%s material</span>", gain))
+				wesnoth.set_variable(string.format("side_stats[%i].material", side.side), (current_wood+gain))
+				wesnoth.float_label(x, y, string.format("<span foreground='#BCB088'>+%i material</span>", gain))
 			end
 		end
 	end
