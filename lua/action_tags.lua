@@ -16,15 +16,19 @@ function modify_terrain(x, y, terrain, layer, sound)
 	wml_actions.redraw {}
 end
 
-function located_harvest(x, y, side, gold, food, material)
+function wml_actions.modify_resources(side, actions, gold, food, material)
+	local current_actions = wesnoth.get_variable(string.format("side_stats[%i].actions", side)) or 0
 	local current_gold = wesnoth.sides[side].gold or 0
 	local current_food = wesnoth.get_variable(string.format("side_stats[%i].food", side)) or 0
 	local current_material = wesnoth.get_variable(string.format("side_stats[%i].material", side)) or 0
 
+	wesnoth.set_variable(string.format("side_stats[%i].actions", side), (current_actions+actions))
 	wesnoth.sides[side].gold = (current_gold+gold)
 	wesnoth.set_variable(string.format("side_stats[%i].food", side), (current_food+food))
 	wesnoth.set_variable(string.format("side_stats[%i].material", side), (current_material+material))
+end
 
+function wml_actions.harvest_label(x, y, gold, food, material)
 	local label = ""
 
 	if gold ~= 0 then
@@ -54,7 +58,8 @@ function wml_actions.harvest_tree(cfg)
 
 			for i, side in ipairs(sides) do
 				local current_bonus = wesnoth.get_variable(string.format("side_bonuses[%i].tree", side.side)) or 0
-				located_harvest(x, y, side.side, 0, 0, (amount+current_bonus))
+				wml_actions.modify_resources(side, 0 0, 0, (amount+current_bonus))
+				wml_actions.harvest_label(x, y, 0, 0, (amount+current_bonus))
 			end
 		end
 	end
@@ -72,7 +77,8 @@ function wml_actions.harvest_reed(cfg)
 
 			for i, side in ipairs(sides) do
 				local current_bonus = wesnoth.get_variable(string.format("side_bonuses[%i].reed", side.side)) or 0
-				located_harvest(x, y, side.side, 0, 0, (amount+current_bonus))
+				wml_actions.modify_resources(side, 0, 0, 0, (amount+current_bonus))
+				wml_actions.harvest_label(x, y, 0, 0, (amount+current_bonus))
 			end
 		end
 	end
@@ -90,7 +96,8 @@ function wml_actions.harvest_mushroom(cfg)
 
 			for i, side in ipairs(sides) do
 				local current_bonus = wesnoth.get_variable(string.format("side_bonuses[%i].mushroom", side.side)) or 0
-				located_harvest(x, y, side.side, (amount+current_bonus), 0, 0)
+				wml_actions.modify_resources(side, 0, (amount+current_bonus), 0, 0)
+				wml_actions.harvest_label(x, y, (amount+current_bonus), 0, 0)
 			end
 		end
 	end
