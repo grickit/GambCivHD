@@ -7,6 +7,7 @@ local COLOR_FOOD = "#00FF22"
 local COLOR_MATERIAL = "#BCB088"
 local DEFAULT_TREE_MATERIAL = 10
 local DEFAULT_REED_MATERIAL = 5
+local DEFAULT_MUSHROOM_GOLD = 30
 
 function modify_terrain(x, y, terrain, layer, sound)
 	wesnoth.scroll_to_tile(x, y, true)
@@ -72,6 +73,24 @@ function wml_actions.harvest_reed(cfg)
 			for i, side in ipairs(sides) do
 				local current_bonus = wesnoth.get_variable(string.format("side_bonuses[%i].reed", side.side)) or 0
 				located_harvest(x, y, side.side, 0, 0, (amount+current_bonus))
+			end
+		end
+	end
+end
+
+function wml_actions.harvest_mushroom(cfg)
+	local sides = wesnoth.get_sides(cfg)
+	local locations = wesnoth.get_locations(cfg)
+	local amount = cfg.amount or DEFAULT_MUSHROOM_GOLD
+
+	for i, loc in ipairs(locations) do
+		local x, y = loc[1], loc[2]
+		if wesnoth.match_location(x, y, { terrain = "*^Em*,*^Uf" }) then
+			modify_terrain(x, y, "Re", "both", "hatchet-miss.wav")
+
+			for i, side in ipairs(sides) do
+				local current_bonus = wesnoth.get_variable(string.format("side_bonuses[%i].mushroom", side.side)) or 0
+				located_harvest(x, y, side.side, (amount+current_bonus), 0, 0)
 			end
 		end
 	end
