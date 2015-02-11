@@ -52,14 +52,13 @@ function wml_actions.harvest_tree(cfg)
 	local amount = cfg.amount or DEFAULT_TREE_MATERIAL
 
 	for i, loc in ipairs(locations) do
-		local x, y = loc[1], loc[2]
-		if wesnoth.match_location(x, y, { terrain = "*^F*" }) then
-			modify_terrain(x, y, "^", "overlay", "wose-die.ogg")
+		if wesnoth.match_location(loc[1], loc[2], { terrain = "*^F*" }) then
+			modify_terrain(loc[1], loc[2], "^", "overlay", "wose-die.ogg")
 
 			for i, side in ipairs(sides) do
 				local current_bonus = wesnoth.get_variable(string.format("side_bonuses[%i].tree_material", side.side)) or 0
 				wml_actions.modify_resources(side.side, 0, 0, 0, (amount+current_bonus))
-				wml_actions.harvest_label(x, y, 0, 0, (amount+current_bonus))
+				wml_actions.harvest_label(loc[1], loc[2], 0, 0, (amount+current_bonus))
 			end
 		end
 	end
@@ -71,14 +70,13 @@ function wml_actions.harvest_reed(cfg)
 	local amount = cfg.amount or DEFAULT_REED_MATERIAL
 
 	for i, loc in ipairs(locations) do
-		local x, y = loc[1], loc[2]
-		if wesnoth.match_location(x, y, { terrain = "Ss" }) then
-			modify_terrain(x, y, "Ww", "both", "wose-die.ogg")
+		if wesnoth.match_location(loc[1], loc[2], { terrain = "Ss" }) then
+			modify_terrain(loc[1], loc[2], "Ww", "both", "wose-die.ogg")
 
 			for i, side in ipairs(sides) do
 				local current_bonus = wesnoth.get_variable(string.format("side_bonuses[%i].reed_material", side.side)) or 0
 				wml_actions.modify_resources(side.side, 0, 0, 0, (amount+current_bonus))
-				wml_actions.harvest_label(x, y, 0, 0, (amount+current_bonus))
+				wml_actions.harvest_label(loc[1], loc[2], 0, 0, (amount+current_bonus))
 			end
 		end
 	end
@@ -90,14 +88,13 @@ function wml_actions.harvest_mushroom(cfg)
 	local amount = cfg.amount or DEFAULT_MUSHROOM_GOLD
 
 	for i, loc in ipairs(locations) do
-		local x, y = loc[1], loc[2]
-		if wesnoth.match_location(x, y, { terrain = "*^Em*,*^Uf" }) then
-			modify_terrain(x, y, "Re", "both", "hatchet-miss.wav")
+		if wesnoth.match_location(loc[1], loc[2], { terrain = "*^Em*,*^Uf" }) then
+			modify_terrain(loc[1], loc[2], "Re", "both", "hatchet-miss.wav")
 
 			for i, side in ipairs(sides) do
 				local current_bonus = wesnoth.get_variable(string.format("side_bonuses[%i].mushroom_gold", side.side)) or 0
 				wml_actions.modify_resources(side.side, 0, (amount+current_bonus), 0, 0)
-				wml_actions.harvest_label(x, y, (amount+current_bonus), 0, 0)
+				wml_actions.harvest_label(loc[1], loc[2], (amount+current_bonus), 0, 0)
 			end
 		end
 	end
