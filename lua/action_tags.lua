@@ -135,3 +135,21 @@ function wml_actions.harvest_wheat(cfg)
 		end
 	end
 end
+
+function wml_actions.harvest_tobacco(cfg)
+	local sides = wesnoth.get_sides(cfg)
+	local locations = wesnoth.get_locations(cfg)
+	local amount = cfg.amount or DEFAULT_TOBACCO_GOLD
+
+	for i, loc in ipairs(locations) do
+		if wesnoth.match_location(loc[1], loc[2], { terrain = "Rb^Gvs" }) then
+			modify_terrain(loc[1], loc[2], "Re", "both", "hatchet-miss.wav")
+
+			for i, side in ipairs(sides) do
+				local current_bonus = wesnoth.get_variable(string.format("side_bonuses[%i].tobacco_gold", side.side)) or 0
+				wml_actions.modify_resources(side.side, 0, (amount+current_bonus), 0, 0)
+				wml_actions.harvest_label(loc[1], loc[2], (amount+current_bonus), 0, 0)
+			end
+		end
+	end
+end
