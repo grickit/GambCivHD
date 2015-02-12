@@ -8,6 +8,7 @@ local COLOR_MATERIAL = "#BCB088"
 local DEFAULT_TREE_MATERIAL = 10
 local DEFAULT_REED_MATERIAL = 5
 local DEFAULT_MUSHROOM_GOLD = 30
+local DEFAULT_WHEAT_FOOD = 3
 
 function modify_terrain(x, y, terrain, layer, sound)
 	wesnoth.scroll_to_tile(x, y, true)
@@ -88,13 +89,31 @@ function wml_actions.harvest_mushroom(cfg)
 	local amount = cfg.amount or DEFAULT_MUSHROOM_GOLD
 
 	for i, loc in ipairs(locations) do
-		if wesnoth.match_location(loc[1], loc[2], { terrain = "*^Em*,*^Uf" }) then
-			modify_terrain(loc[1], loc[2], "Re", "both", "hatchet-miss.wav")
+		if wesnoth.match_location(loc[1], loc[2], { terrain = "" }) then
+			modify_terrain(loc[1], loc[2], "*^Em,*^Emf,*^Uf", "both", "hatchet-miss.wav")
 
 			for i, side in ipairs(sides) do
 				local current_bonus = wesnoth.get_variable(string.format("side_bonuses[%i].mushroom_gold", side.side)) or 0
 				wml_actions.modify_resources(side.side, 0, (amount+current_bonus), 0, 0)
 				wml_actions.harvest_label(loc[1], loc[2], (amount+current_bonus), 0, 0)
+			end
+		end
+	end
+end
+
+function wml_actions.harvest_wheat(cfg)
+	local sides = wesnoth.get_sides(cfg)
+	local locations = wesnoth.get_locations(cfg)
+	local amount = cfg.amount or DEFAULT_WHEAT_FOOD
+
+	for i, loc in ipairs(locations) do
+		if wesnoth.match_location(loc[1], loc[2], { terrain = "Gd^Gvs" }) then
+			modify_terrain(loc[1], loc[2], "Re", "both", "hatchet-miss.wav")
+
+			for i, side in ipairs(sides) do
+				local current_bonus = wesnoth.get_variable(string.format("side_bonuses[%i].wheat_food", side.side)) or 0
+				wml_actions.modify_resources(side.side, 0, 0, (amount+current_bonus), 0)
+				wml_actions.harvest_label(loc[1], loc[2], 0, (amount+current_bonus), 0)
 			end
 		end
 	end
