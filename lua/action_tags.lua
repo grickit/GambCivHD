@@ -5,16 +5,33 @@ local COLOR_ACTION = "#00CDFF"
 local COLOR_GOLD = "#FFE700"
 local COLOR_FOOD = "#00FF22"
 local COLOR_MATERIAL = "#BCB088"
-local DEFAULT_TREE_MATERIAL = 10
-local DEFAULT_REED_MATERIAL = 5
-local DEFAULT_MUSHROOM_GOLD = 30
+
+local DEFAULT_TOBACCO_GOLD = 10
+local DEFAULT_TREE_MATERIAL = 15
 local DEFAULT_WHEAT_FOOD = 3
+local DEFAULT_MINE_GOLD = 20
+local DEFAULT_FISH_FOOD = 6
+local DEFAULT_QUARRY_MATERIAL = 30
+local DEFAULT_REED_MATERIAL = 10
+local DEFAULT_MUSHROOM_GOLD = 25
+
+for i, side in ipairs(wesnoth.sides) do
+	wesnoth.set_variable(string.format("side_bonuses[%i].tobacco_gold", side.side), 0)
+	wesnoth.set_variable(string.format("side_bonuses[%i].tree_material", side.side), 0)
+	wesnoth.set_variable(string.format("side_bonuses[%i].wheat_food", side.side), 0)
+	wesnoth.set_variable(string.format("side_bonuses[%i].mine_gold", side.side), 0)
+	wesnoth.set_variable(string.format("side_bonuses[%i].fish_food", side.side), 0)
+	wesnoth.set_variable(string.format("side_bonuses[%i].quarry_material", side.side), 0)
+	wesnoth.set_variable(string.format("side_bonuses[%i].reed_material", side.side), 0)
+	wesnoth.set_variable(string.format("side_bonuses[%i].mushroom_gold", side.side), 0)
+end
 
 function modify_terrain(x, y, terrain, layer, sound)
 	wesnoth.scroll_to_tile(x, y, true)
 	wesnoth.play_sound(sound,false)
 	wesnoth.set_terrain(x, y, terrain, layer)
-	wml_actions.redraw {}
+	wesnoth.add_tile_overlay(x, y, { image = "scenery/rune4-glow.png" })
+	wml_actions.store_locations({ variable = "just_modified", x = x, y = y,  { "or", { find_in = "just_modified" }}})
 end
 
 function wml_actions.modify_resources(side, actions, gold, food, material)
