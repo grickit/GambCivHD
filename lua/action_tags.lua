@@ -26,6 +26,48 @@ for i, side in ipairs(wesnoth.sides) do
 	wesnoth.set_variable(string.format("side_bonuses[%i].mushroom_gold", side.side), 0)
 end
 
+function check_resources(side, actions, gold, food, material)
+	local current_actions = wesnoth.get_variable(string.format("side_stats[%i].actions", side)) or 0
+	local current_gold = wesnoth.sides[side].gold or 0
+	local current_food = wesnoth.get_variable(string.format("side_stats[%i].food", side)) or 0
+	local current_material = wesnoth.get_variable(string.format("side_stats[%i].material", side)) or 0
+	local valid = true
+
+	wesnoth.set_variable(string.format("side_stats[%i].gold", side), (current_gold+gold))
+
+
+	if current_actions < actions then
+		if wesnoth.sides[side].controller == "human" then
+			wesnoth.message('RESOURCES', 'Not enough actions.')
+		end
+	end
+
+	if current_gold < gold then
+		if wesnoth.sides[side].controller == "human" then
+			wesnoth.message('RESOURCES', 'Not enough gold.')
+		end
+	end
+
+	if current_food < food then
+		if wesnoth.sides[side].controller == "human" then
+			wesnoth.message('RESOURCES', 'Not enough food.')
+		end
+	end
+
+	if current_material < material then
+		if wesnoth.sides[side].controller == "human" then
+			wesnoth.message('RESOURCES', 'Not enough material.')
+		end
+	end
+
+	if current_actions < actions or current_gold < gold or current_food < food or current_material < material then
+		wesnoth.play_sound("miss-2.ogg",false)
+		return true
+	end
+
+	return false
+end
+
 function modify_terrain(x, y, terrain, layer, sound)
 	wesnoth.scroll_to_tile(x, y, true)
 	wesnoth.play_sound(sound,false)
@@ -42,6 +84,7 @@ function wml_actions.modify_resources(side, actions, gold, food, material)
 
 	wesnoth.set_variable(string.format("side_stats[%i].actions", side), (current_actions+actions))
 	wesnoth.sides[side].gold = (current_gold+gold)
+	wesnoth.set_variable(string.format("side_stats[%i].gold", side), (current_gold+gold))
 	wesnoth.set_variable(string.format("side_stats[%i].food", side), (current_food+food))
 	wesnoth.set_variable(string.format("side_stats[%i].material", side), (current_material+material))
 end
