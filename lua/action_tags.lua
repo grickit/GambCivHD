@@ -6,15 +6,6 @@ local COLOR_GOLD = "#FFE700"
 local COLOR_FOOD = "#00FF22"
 local COLOR_MATERIAL = "#BCB088"
 
-local DEFAULT_TOBACCO_GOLD = 10
-local DEFAULT_TREE_MATERIAL = 15
-local DEFAULT_WHEAT_FOOD = 3
-local DEFAULT_MINE_GOLD = 20
-local DEFAULT_FISH_FOOD = 6
-local DEFAULT_QUARRY_MATERIAL = 30
-local DEFAULT_REED_MATERIAL = 10
-local DEFAULT_MUSHROOM_GOLD = 25
-
 for i, side in ipairs(wesnoth.sides) do
 	wesnoth.set_variable(string.format("side_bonuses[%i].tobacco_gold", side.side), 0)
 	wesnoth.set_variable(string.format("side_bonuses[%i].tree_material", side.side), 0)
@@ -110,7 +101,7 @@ end
 function wml_actions.harvest_tree(cfg)
 	local sides = wesnoth.get_sides(cfg)
 	local locations = wesnoth.get_locations(cfg)
-	local amount = cfg.amount or DEFAULT_TREE_MATERIAL
+	local amount = cfg.amount or wesnoth.get_variable("GAMBCIVHD_MODCONFIG_DEFAULT_TREE_MATERIAL")
 
 	for i, loc in ipairs(locations) do
 		if wesnoth.match_location(loc[1], loc[2], { terrain = "*^F*" }) then
@@ -128,7 +119,7 @@ end
 function wml_actions.harvest_reed(cfg)
 	local sides = wesnoth.get_sides(cfg)
 	local locations = wesnoth.get_locations(cfg)
-	local amount = cfg.amount or DEFAULT_REED_MATERIAL
+	local amount = cfg.amount or wesnoth.get_variable("GAMBCIVHD_MODCONFIG_DEFAULT_REED_MATERIAL")
 
 	for i, loc in ipairs(locations) do
 		if wesnoth.match_location(loc[1], loc[2], { terrain = "Ss" }) then
@@ -146,11 +137,11 @@ end
 function wml_actions.harvest_mushroom(cfg)
 	local sides = wesnoth.get_sides(cfg)
 	local locations = wesnoth.get_locations(cfg)
-	local amount = cfg.amount or DEFAULT_MUSHROOM_GOLD
+	local amount = cfg.amount or wesnoth.get_variable("GAMBCIVHD_MODCONFIG_DEFAULT_MUSHROOM_GOLD")
 
 	for i, loc in ipairs(locations) do
-		if wesnoth.match_location(loc[1], loc[2], { terrain = "" }) then
-			modify_terrain(loc[1], loc[2], "*^Em,*^Emf,*^Uf", "both", "hatchet-miss.wav")
+		if wesnoth.match_location(loc[1], loc[2], { terrain = "*^Em,*^Emf,*^Uf" }) then
+			modify_terrain(loc[1], loc[2], "Re", "both", "hatchet-miss.wav")
 
 			for i, side in ipairs(sides) do
 				local current_bonus = wesnoth.get_variable(string.format("side_bonuses[%i].mushroom_gold", side.side)) or 0
@@ -164,7 +155,7 @@ end
 function wml_actions.harvest_wheat(cfg)
 	local sides = wesnoth.get_sides(cfg)
 	local locations = wesnoth.get_locations(cfg)
-	local amount = cfg.amount or DEFAULT_WHEAT_FOOD
+	local amount = cfg.amount or wesnoth.get_variable("GAMBCIVHD_MODCONFIG_DEFAULT_WHEAT_FOOD")
 
 	for i, loc in ipairs(locations) do
 		if wesnoth.match_location(loc[1], loc[2], { terrain = "Gd^Gvs" }) then
@@ -182,7 +173,7 @@ end
 function wml_actions.harvest_tobacco(cfg)
 	local sides = wesnoth.get_sides(cfg)
 	local locations = wesnoth.get_locations(cfg)
-	local amount = cfg.amount or DEFAULT_TOBACCO_GOLD
+	local amount = cfg.amount or wesnoth.get_variable("GAMBCIVHD_MODCONFIG_DEFAULT_TOBACCO_GOLD")
 
 	for i, loc in ipairs(locations) do
 		if wesnoth.match_location(loc[1], loc[2], { terrain = "Rb^Gvs" }) then
