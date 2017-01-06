@@ -1,10 +1,11 @@
 local helper = wesnoth.require "lua/helper.lua"
 local wml_actions = wesnoth.wml_actions
+local gambciv = {}
 
-local COLOR_ACTION = "#00CDFF"
-local COLOR_GOLD = "#FFE700"
-local COLOR_FOOD = "#00FF22"
-local COLOR_MATERIAL = "#BCB088"
+gambciv.COLOR_ACTION = "#00CDFF"
+gambciv.COLOR_GOLD = "#FFE700"
+gambciv.COLOR_FOOD = "#00FF22"
+gambciv.COLOR_MATERIAL = "#BCB088"
 
 for i, side in ipairs(wesnoth.sides) do
 	wesnoth.set_variable(string.format("side_bonuses[%i].tobacco_gold", side.side), 0)
@@ -15,14 +16,16 @@ for i, side in ipairs(wesnoth.sides) do
 	wesnoth.set_variable(string.format("side_bonuses[%i].quarry_material", side.side), 0)
 	wesnoth.set_variable(string.format("side_bonuses[%i].reed_material", side.side), 0)
 	wesnoth.set_variable(string.format("side_bonuses[%i].mushroom_gold", side.side), 0)
+
+	wesnoth.set_variable(string.format("side_stats[%i].actions", side.side), 5)
+
 end
 
-function check_resources(side, actions, gold, food, material)
+function gambciv.check_resources(side, actions, gold, food, material)
 	local current_actions = wesnoth.get_variable(string.format("side_stats[%i].actions", side)) or 0
 	local current_gold = wesnoth.sides[side].gold or 0
 	local current_food = wesnoth.get_variable(string.format("side_stats[%i].food", side)) or 0
 	local current_material = wesnoth.get_variable(string.format("side_stats[%i].material", side)) or 0
-	local valid = true
 
 	wesnoth.set_variable(string.format("side_stats[%i].gold", side), (current_gold+gold))
 
@@ -53,13 +56,13 @@ function check_resources(side, actions, gold, food, material)
 
 	if current_actions < actions or current_gold < gold or current_food < food or current_material < material then
 		wesnoth.play_sound("miss-2.ogg",false)
-		return true
+		return false
 	end
 
-	return false
+	return true
 end
 
-function modify_terrain(x, y, terrain, layer, sound)
+function gambciv.modify_terrain(x, y, terrain, layer, sound)
 	wesnoth.scroll_to_tile(x, y, true)
 	wesnoth.play_sound(sound,false)
 	wesnoth.set_terrain(x, y, terrain, layer)
@@ -84,36 +87,40 @@ function wml_actions.harvest_label(x, y, gold, food, material)
 	local label = ""
 
 	if gold ~= 0 then
-		label = label .. string.format("<span foreground='%s'>+%i gold</span> ",COLOR_GOLD,gold)
+		label = label .. string.format("<span foreground='%s'>+%i gold</span> ",gambciv.COLOR_GOLD,gold)
 	end
 
 	if food ~= 0 then
-		label = label .. string.format("<span foreground='%s'>+%i food</span> ",COLOR_FOOD,food)
+		label = label .. string.format("<span foreground='%s'>+%i food</span> ",gambciv.COLOR_FOOD,food)
 	end
 
 	if material ~= 0 then
-		label = label .. string.format("<span foreground='%s'>+%i material</span> ",COLOR_MATERIAL,material)
+		label = label .. string.format("<span foreground='%s'>+%i material</span> ",gambciv.COLOR_MATERIAL,material)
 	end
 
 	wesnoth.float_label(x, y, label)
 end
 
-function wml_actions.harvest_tree(cfg)
-	local sides = wesnoth.get_sides(cfg)
-	local locations = wesnoth.get_locations(cfg)
-	local amount = cfg.amount or wesnoth.get_variable("GAMBCIVHD_MODCONFIG_DEFAULT_TREE_MATERIAL")
+function wml_actions.cost_label(x, y, actions, gold, food, material)
+	local label = ""
 
-	for i, loc in ipairs(locations) do
-		if wesnoth.match_location(loc[1], loc[2], { terrain = "*^F*" }) then
-			modify_terrain(loc[1], loc[2], "^", "overlay", "wose-die.ogg")
-
-			for i, side in ipairs(sides) do
-				local current_bonus = wesnoth.get_variable(string.format("side_bonuses[%i].tree_material", side.side)) or 0
-				wml_actions.modify_resources(side.side, 0, 0, 0, (amount+current_bonus))
-				wml_actions.harvest_label(loc[1], loc[2], 0, 0, (amount+current_bonus))
-			end
-		end
+	if gold ~= 0 then
+		label = label .. string.format("<span foreground='%s'>-%i actions</span> ",gambciv.COLOR_ACTION,action)
 	end
+
+	if gold ~= 0 then
+		label = label .. string.format("<span foreground='%s'>-%i gold</span> ",gambciv.COLOR_GOLD,gold)
+	end
+
+	if food ~= 0 then
+		label = label .. string.format("<span foreground='%s'>-%i food</span> ",gambciv.COLOR_FOOD,food)
+	end
+
+	if material ~= 0 then
+		label = label .. string.format("<span foreground='%s'>-%i material</span> ",gambciv.COLOR_MATERIAL,material)
+	end
+
+	wesnoth.float_label(x, y, label)
 end
 
 function wml_actions.harvest_reed(cfg)
@@ -187,3 +194,25 @@ function wml_actions.harvest_tobacco(cfg)
 		end
 	end
 end
+
+function wml_actions.operate_goldmine(cfg)
+	local sides = wesnoth.get_sides(cfg)
+	local locations = wesnoth.get_locations(cfg)
+	local amount = cfg.amount or wesnoth.get_variable("GAMBCIVHD_MODCONFIG_DEFAULT_MINE_GOLD")
+
+	for i, loc in ipairs(locations) do
+		if wesnoth.match_location(loc[1], loc[2], { terrain = "M*^Vhh" }) then
+			modify_terrain(loc[1], loc[2], "^", "base", "gold.ogg")
+
+			for i, side in ipairs(sides) do
+				if check_resources(side.side, 1, 0, 0, 0) then
+					local current_bonus = wesnoth.get_variable(string.format("side_bonuses[%i].mine_gold", side.side)) or 0
+					wml_actions.modify_resources(side.side, -1, (amount+current_bonus), 0, 0)
+					wml_actions.harvest_label(loc[1], loc[2], (amount+current_bonus), 0, 0)
+				end
+			end
+		end
+	end
+end
+
+return gambciv
