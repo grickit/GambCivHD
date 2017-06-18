@@ -141,24 +141,6 @@ function wml_actions.harvest_reed(cfg)
 	end
 end
 
-function wml_actions.harvest_mushroom(cfg)
-	local sides = wesnoth.get_sides(cfg)
-	local locations = wesnoth.get_locations(cfg)
-	local amount = cfg.amount or wesnoth.get_variable("GAMBCIVHD_MODCONFIG_DEFAULT_MUSHROOM_GOLD")
-
-	for i, loc in ipairs(locations) do
-		if wesnoth.match_location(loc[1], loc[2], { terrain = "*^Em,*^Emf,*^Uf" }) then
-			modify_terrain(loc[1], loc[2], "Re", "both", "hatchet-miss.wav")
-
-			for i, side in ipairs(sides) do
-				local current_bonus = wesnoth.get_variable(string.format("side_bonuses[%i].mushroom_gold", side.side)) or 0
-				wml_actions.modify_resources(side.side, 0, (amount+current_bonus), 0, 0)
-				wml_actions.harvest_label(loc[1], loc[2], (amount+current_bonus), 0, 0)
-			end
-		end
-	end
-end
-
 function wml_actions.operate_goldmine(cfg)
 	local sides = wesnoth.get_sides(cfg)
 	local locations = wesnoth.get_locations(cfg)
