@@ -10,9 +10,9 @@ local tag = helper.set_wml_tag_metatable {}
 -- [/harvest_tobacco]
 
 function wml_actions.harvest_tobacco(cfg)
-	local side = cfg.side
-	local locations = wesnoth.get_locations { terrain = "Rb^Gvs", tag["not"]{ find_in = "just_modified"}, tag["and"](cfg)}
-	local amount = cfg.amount or wesnoth.get_variable("GAMBCIVHD_MODCONFIG_DEFAULT_TOBACCO_GOLD")
+  local side = cfg.side
+  local locations = wesnoth.get_locations { terrain = "Rb^Gvs", tag["not"]{ find_in = "just_modified"}, tag["and"](cfg)}
+  local amount = cfg.amount or wesnoth.get_variable("GAMBCIVHD_MODCONFIG_DEFAULT_TOBACCO_GOLD")
   local current_bonus = wesnoth.get_variable(string.format("side_bonuses[%i].tobacco_gold", side)) or 0
 
   local cost_actions = cfg.cost_actions or 0
@@ -20,7 +20,7 @@ function wml_actions.harvest_tobacco(cfg)
   local cost_food = cfg.cost_food or 0
   local cost_material = cfg.cost_material or 0
 
-	for i, loc in ipairs(locations) do
+  for i, loc in ipairs(locations) do
     if gambciv.check_resources(side, cost_actions, cost_gold, cost_food, cost_material) == false then
       break
     end
@@ -30,5 +30,5 @@ function wml_actions.harvest_tobacco(cfg)
     wml_actions.harvest_label(loc[1], loc[2], (amount+current_bonus), 0, 0)
     wml_actions.cost_label(loc[1], loc[2], cost_actions, cost_gold, cost_food, cost_material)
 
-	end
+  end
 end
