@@ -7,7 +7,7 @@ local wml_actions = wesnoth.wml_actions
 --  amount = 50
 -- [/harvest_reed]
 
-function wml_actions.harvest_wheat(cfg)
+function wml_actions.harvest_reed(cfg)
 	local side = cfg.side
 	local locations = wesnoth.get_locations(cfg)
 	local amount = cfg.amount or wesnoth.get_variable("GAMBCIVHD_MODCONFIG_DEFAULT_REED_MATERIAL")
