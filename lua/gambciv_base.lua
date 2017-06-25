@@ -17,7 +17,7 @@ for i, side in ipairs(wesnoth.sides) do
 	wesnoth.set_variable(string.format("side_bonuses[%i].reed_material", side.side), 0)
 	wesnoth.set_variable(string.format("side_bonuses[%i].mushroom_gold", side.side), 0)
 
-	wesnoth.set_variable(string.format("side_stats[%i].actions", side.side), 5)
+	wesnoth.set_variable(string.format("side_stats[%i].actions", side.side), 100)
 
 end
 
