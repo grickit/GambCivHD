@@ -123,24 +123,6 @@ function wml_actions.cost_label(x, y, actions, gold, food, material)
 	wesnoth.float_label(x, y, label)
 end
 
-function wml_actions.harvest_reed(cfg)
-	local sides = wesnoth.get_sides(cfg)
-	local locations = wesnoth.get_locations(cfg)
-	local amount = cfg.amount or wesnoth.get_variable("GAMBCIVHD_MODCONFIG_DEFAULT_REED_MATERIAL")
-
-	for i, loc in ipairs(locations) do
-		if wesnoth.match_location(loc[1], loc[2], { terrain = "Ss" }) then
-			modify_terrain(loc[1], loc[2], "Ww", "both", "wose-die.ogg")
-
-			for i, side in ipairs(sides) do
-				local current_bonus = wesnoth.get_variable(string.format("side_bonuses[%i].reed_material", side.side)) or 0
-				wml_actions.modify_resources(side.side, 0, 0, 0, (amount+current_bonus))
-				wml_actions.harvest_label(loc[1], loc[2], 0, 0, (amount+current_bonus))
-			end
-		end
-	end
-end
-
 function wml_actions.operate_goldmine(cfg)
 	local sides = wesnoth.get_sides(cfg)
 	local locations = wesnoth.get_locations(cfg)
